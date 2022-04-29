@@ -82,6 +82,14 @@ source._dirname = function(self, params, opts)
   if prefix:match('~/$') then
     return vim.fn.resolve(vim.fn.expand('~') .. '/' .. dirname)
   end
+  if prefix:match('/$') then
+    local rdirs = {'public', 'images', 'image', 'imgs', 'img'}
+    for rindex,rdir in pairs(rdirs) do
+      if vim.fn.isdirectory('./' .. rdir) ~= 0 then
+        return vim.fn.resolve('./' .. rdir)
+      end
+    end
+  end
   local env_var_name = prefix:match('%$([%a_]+)/$')
   if env_var_name then
     local env_var_value = vim.fn.getenv(env_var_name)
