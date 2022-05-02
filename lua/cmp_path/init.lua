@@ -82,7 +82,8 @@ source._dirname = function(self, params, opts)
   if prefix:match('~/$') then
     return vim.fn.resolve(vim.fn.expand('~') .. '/' .. dirname)
   end
-  if prefix:match('/$') then
+  -- TODO: zennの画像に対応させる
+  if prefix:match('src="/$') then
     local rdirs = {'public', 'images', 'image', 'imgs', 'img'}
     for rindex,rdir in pairs(rdirs) do
       if vim.fn.isdirectory('./' .. rdir) ~= 0 then
