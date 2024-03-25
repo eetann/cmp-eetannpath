@@ -1,3 +1,4 @@
+-- stylua: ignore start
 local cmp = require 'cmp'
 
 local NAME_REGEX = '\\%([^/\\\\:\\*?<>\'"`\\|]\\)'
@@ -72,7 +73,7 @@ source._dirname = function(self, params, option)
   end
 
   local dirname = string.gsub(string.sub(params.context.cursor_before_line, s + 2), '%a*$', '') -- exclude '/'
-  local prefix = string.sub(params.context.cursor_before_line, 1, s + 1) -- include '/'
+  local prefix = string.sub(params.context.cursor_before_line, 1, s + 1)                        -- include '/'
 
   local buf_dirname = option.get_cwd(params)
   if vim.api.nvim_get_mode().mode == 'c' then
@@ -84,18 +85,26 @@ source._dirname = function(self, params, option)
   if (prefix:match('%./$') or prefix:match('"$') or prefix:match('\'$')) then
     return vim.fn.resolve(buf_dirname .. '/' .. dirname)
   end
-  if prefix:match('~/$') then
-    return vim.fn.resolve(vim.fn.expand('~') .. '/' .. dirname)
-  end
-  -- TODO: zennの画像に対応させる
-  if prefix:match('src="/$') then
-    local rdirs = {'public', 'images', 'image', 'imgs', 'img'}
-    for rindex,rdir in pairs(rdirs) do
-      if vim.fn.isdirectory('./' .. rdir) ~= 0 then
-        return vim.fn.resolve('./' .. rdir)
-      end
+  -- ブログ用
+  -- dirname assets/images/eagle-amazing-app/
+  -- prefix  src="~/
+  if prefix:match("src=.~/$") then
+    if vim.fn.isdirectory("./src/assets/images/") ~= 0 then
+      return vim.fn.resolve("./src/" .. dirname)
     end
   end
+  if prefix:match("~/$") then
+    return vim.fn.resolve(vim.fn.expand("~") .. "/" .. dirname)
+  end
+  -- TODO: zennの画像に対応させる
+  -- if prefix:match('src=./$') then
+  --   local rdirs = {'public', 'images', 'image', 'imgs', 'img'}
+  --   for rindex,rdir in pairs(rdirs) do
+  --     if vim.fn.isdirectory('./' .. rdir) ~= 0 then
+  --       return vim.fn.resolve('./' .. rdir)
+  --     end
+  --   end
+  -- end
   local env_var_name = prefix:match('%$([%a_]+)/$')
   if env_var_name then
     local env_var_value = vim.fn.getenv(env_var_name)
@@ -237,3 +246,4 @@ source._get_documentation = function(_, filename, count)
 end
 
 return source
+-- stylua: ignore end
